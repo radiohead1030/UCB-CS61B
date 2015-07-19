@@ -12,8 +12,36 @@ public class Calculator {
      * @return the sum of x and y
      **/
     public int add(int x, int y) {
-        // YOUR CODE HERE
-        return -1;
+	    int op1;
+	    int op2;
+	    int sum = 0;
+	    int carry = 0;
+	    int result = 0;
+	    for (int i = 0; i < 32; i++){
+		op1 = getBit(x, i);
+		op2 = getBit(y, i);
+		sum = op1 ^ op2 ^ carry;
+		carry = op1 & op2 | (op1 ^ op2) & carry;
+		if (sum == 1)
+			result = setBit(result, i);
+	    }
+	    return result;
+    }
+
+    private int getBit(int x, int i){
+	if(i >= 32)
+		return -1;
+	else{
+		return ((x>>i) & 1);
+	}
+    }
+    
+    private int setBit(int x, int i){
+	if(i >= 32)
+		return -1;
+	else{
+		return (x | (1<<i));
+	}
     }
 
     /**
@@ -25,8 +53,19 @@ public class Calculator {
      * @return the product of x and y
      **/
     public int multiply(int x, int y) {
-        // YOUR CODE HERE
-        return -1;
+	    int result = 0;
+	    int partialY = 0;
+	    if (x == 0 | y ==0)
+		    return 0;
+	    else{
+		for(int i = 0; i < 32; i++){
+			partialY = getBit(y, i);
+			if (partialY == 1){
+				result = this.add(result, x<<i);		
+			}
+		}
+		return result;
+	    }
     }
 
     /**
