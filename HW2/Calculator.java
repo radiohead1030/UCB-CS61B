@@ -2,7 +2,7 @@ import list.EquationList;
 
 public class Calculator {
     // YOU MAY WISH TO ADD SOME FIELDS
-
+	public EquationList equationHistory = null;
     /**
      * TASK 2: ADDING WITH BIT OPERATIONS
      * add() is a method which computes the sum of two integers x and y using 
@@ -78,7 +78,13 @@ public class Calculator {
      * @param result is an integer corresponding to the result of the equation
      **/
     public void saveEquation(String equation, int result) {
-        // YOUR CODE HERE
+	    if ( this.equationHistory == null){
+		    this.equationHistory = new EquationList(equation, result, null);
+	    }
+	    else {
+		    EquationList equationLatest = new EquationList(equation, result, this.equationHistory);
+		    this.equationHistory = equationLatest;
+	    }
     }
 
     /**
@@ -89,7 +95,13 @@ public class Calculator {
      * Ex   "1 + 2 = 3"
      **/
     public void printAllHistory() {
-        // YOUR CODE HERE
+	    EquationList equationP = this.equationHistory;
+	    int n = 0;
+	    while (equationP != null){
+		    n += 1;
+		    equationP = equationP.next;
+	    }
+	    this.printHistory(n);
     }
 
     /**
@@ -100,7 +112,12 @@ public class Calculator {
      * Ex   "1 + 2 = 3"
      **/
     public void printHistory(int n) {
-        // YOUR CODE HERE
+	    EquationList equationP = this.equationHistory;
+	    while (equationP != null && n >= 1){
+		    System.out.println (equationP.equation + " = " + equationP.result);
+		    equationP = equationP.next;
+		    n = n - 1;
+	    }
     }    
 
     /**
@@ -109,6 +126,9 @@ public class Calculator {
     **/
     public void undoEquation() {
         // YOUR CODE HERE
+	if (this.equationHistory != null){
+		this.equationHistory = this.equationHistory.next;
+	}
     }
 
     /**
@@ -116,7 +136,7 @@ public class Calculator {
      * clearHistory() removes all entries in our history.
      **/
     public void clearHistory() {
-        // YOUR CODE HERE
+	this.equationHistory = null;
     }
 
     /**
@@ -126,8 +146,19 @@ public class Calculator {
      * @return the sum of all of the results in history
      **/
     public int cumulativeSum() {
-        // YOUR CODE HERE
-        return -1;
+	    EquationList equationP = this.equationHistory;
+	    int sum = 0;
+
+	    if (equationP == null){
+		    return 0;
+	    }
+	    else{
+		    while (equationP != null){
+			    sum = this.add(equationP.result, sum);
+			    equationP = equationP.next;
+		    }
+		    return sum;
+	    }
     }
 
     /**
