@@ -28,8 +28,10 @@ public class CalculatorUI{
 				cal.undoEquation();	
 			}
 			else if(starter.equals("sum")){
-				cal.cumulativeSum();	
 				System.out.println (cal.cumulativeSum());
+			}
+			else if(starter.equals("product")){
+				System.out.println (cal.cumulativeProduct());
 			}
 			else{
 				a = Integer.parseInt(starter);

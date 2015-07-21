@@ -168,7 +168,18 @@ public class Calculator {
      * @return the product of all of the results in history
      **/
     public int cumulativeProduct() {
-        // YOUR CODE HERE
-        return -1;
+	    EquationList equationP = this.equationHistory;
+	    int product = 1;
+
+	    if (equationP == null){
+		    return 1;
+	    }
+	    else{
+		    while (equationP != null){
+			    product = this.multiply(equationP.result, product);
+			    equationP = equationP.next;
+		    }
+		    return product;
+	    }
     }
 }
