@@ -1,12 +1,9 @@
 public class Piece{
-	public boolean isFire;
+	private boolean isFire, isKing, hasCaptured;
 	public Board b;
 	public int x;
 	public int y;
 	public String type;
-	public boolean isKing = false;
-	public boolean hasCaptured = false;
-	public boolean removed = false;
 
 	public Piece(boolean isFire, Board b, int x, int y, String type){
 		this.isFire = isFire;
@@ -14,6 +11,7 @@ public class Piece{
 		this.x = x;
 		this.y = y;
 		this.type = type;
+		this.isKing = false;
 		this.hasCaptured = false;
 	}
 	
@@ -50,6 +48,26 @@ public class Piece{
 	}
 	
 	public void move(int x,int y){
-		
+		Piece p = b.pieceAt(x, y);
+		this.x = x;
+		this.y = y;		
+
+		if(this.isFire() && this.y == 7 || !this.isFire() && this.y == 0)
+				this.isKing = true;
+
+		if(p != null && !this.equals(p)){
+			this.hasCaptured = true;
+			if(this.isBomb()){
+				for(int i = this.x -1 ; i <= this.x+1; i++){
+					for(int j = this.y -1 ; j <= this.y+1; j++){
+						Piece neighborP = b.pieceAt(i, j);
+						if(neighborP != null && !neighborP.isShield()){
+							b.remove(i, j);
+						}
+					}
+				}
+				b.remove(this.x, this.y);
+			}
+		}
 	}
 }

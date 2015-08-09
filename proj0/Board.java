@@ -1,15 +1,11 @@
 public class Board{
 	private static int width = 8;
 	private static int height = 8;
-	private int pieceNumber = 24;
-	public Piece[]	pieces = new Piece[pieceNumber];
+	public Piece[][] pieces = new Piece[width][height];
 
-	//private boolean fireTurn;
-	public boolean fireTurn;
-	//private boolean waterTurn;
-	public boolean waterTurn;
-	//private Piece selectPiece;
-	public Piece selectPiece;
+	private boolean fireTurn;
+	private boolean waterTurn;
+	private Piece selectPiece;
 	private boolean moveSelectPiece;
 
 	public static void main(String args[]){
@@ -44,44 +40,33 @@ public class Board{
 		selectPiece = null;
 		moveSelectPiece = false;
 		
-		int pieceIndex = 0;
 		for(int j = 0; j < height; j++){
 			for(int i = 0; i < width; i++){
 				if((i + j) % 2 == 0) StdDrawPlus.setPenColor(StdDrawPlus.GRAY);
 				else StdDrawPlus.setPenColor(StdDrawPlus.RED);
 				StdDrawPlus.filledSquare(i + .5, j + .5, 0.5);
+
 				if(!shouldBeEmpty){
 					if(j == 0 && (i % 2 == 0)) {
-						pieces[pieceIndex] = new Piece(true, this, i, j, "pawn");
-						pieceIndex++;
-						StdDrawPlus.picture(i + .5, j + .5, "img/pawn-fire.png", 1, 1);
+						pieces[i][j] = new Piece(true, this, i, j, "pawn");
 						}
 					else if(j == 1 && (i % 2 != 0)) {
-						pieces[pieceIndex] = new Piece(true, this, i, j, "shield");
-						pieceIndex++;
-						StdDrawPlus.picture(i + .5, j + .5, "img/shield-fire.png", 1, 1);
+						pieces[i][j] = new Piece(true, this, i, j, "shield");
 						}
 					else if(j == 2 && (i % 2 == 0)){
-						pieces[pieceIndex] = new Piece(true, this, i, j, "bomb");
-						pieceIndex++;
-						StdDrawPlus.picture(i + .5, j + .5, "img/bomb-fire.png", 1, 1);
+						pieces[i][j] = new Piece(true, this, i, j, "bomb");
 						}
 					else if(j == height - 1 && (i % 2 != 0)){
-						pieces[pieceIndex] = new Piece(false, this, i, j, "pawn");
-						pieceIndex++;
-						StdDrawPlus.picture(i + .5, j + .5, "img/pawn-water.png", 1, 1);
+						pieces[i][j] = new Piece(false, this, i, j, "pawn");
 						}
 					else if(j == height - 2 && (i % 2 == 0)){
-						pieces[pieceIndex] = new Piece(false, this, i, j, "shield");
-						pieceIndex++;
-						StdDrawPlus.picture(i + .5, j + .5, "img/shield-water.png", 1, 1);
+						pieces[i][j] = new Piece(false, this, i, j, "shield");
 						}	
 					else if(j == height - 3 && (i % 2 != 0)) {
-						pieces[pieceIndex] = new Piece(false, this, i, j, "bomb");
-						pieceIndex++;
-						StdDrawPlus.picture(i + .5, j + .5, "img/bomb-water.png", 1, 1);
+						pieces[i][j] = new Piece(false, this, i, j, "bomb");
 						}
 					}
+					drawPiece(pieces[i][j], i, j);
 				}
 			}
 		}
@@ -90,18 +75,10 @@ public class Board{
 		if(isOutOfBounds(x,y)){
 			return null;
 		}
-		for(int i = 0; i < pieceNumber; i++){
-			if(pieces[i] != null){
-				if(x == pieces[i].x && y == pieces[i].y){
-					if(pieces[i].removed == false){
-						return pieces[i];
-					}
-				else continue;	
-				}
-			}
-			else continue;
-		}
-		return null;
+		if(pieces[x][y] == null)
+			return null;
+		else
+			return pieces[x][y];
 	}
 	
 	public Piece remove(int x, int y){
@@ -116,16 +93,17 @@ public class Board{
 			else StdDrawPlus.setPenColor(StdDrawPlus.RED);
 			StdDrawPlus.filledSquare(x + .5, y + .5, 0.5);
 		}
-
+		
+		pieces[x][y] = null;	
 		return p;
 	}
 	
 	public void place(Piece p, int x, int y){
 		if(!isOutOfBounds(x,y) && p != null){
-			this.remove(x,y);
+			pieces[x][y] = this.remove(x,y);
+			p.move(x, y);
 			this.drawPiece(p, x, y);
-			p.x = x;
-			p.y = y;
+			pieces[x][y] = p;
 		}
 	}
 	
@@ -143,7 +121,7 @@ public class Board{
 				return false;
 			}
 			else if (selectPiece != null && moveSelectPiece == false){
-				if(selectPiece.isFire() == p.isFire()){
+				if(selectPiece.side() == p.side()){
 					return true;
 				}	
 				return this.validMove(selectPiece.x, selectPiece.y, x, y);		
@@ -178,15 +156,15 @@ public class Board{
 			if(selectPiece != null){
 			 	StdDrawPlus.setPenColor(StdDrawPlus.WHITE);
 			 	StdDrawPlus.filledSquare(x + .5, y + .5, 0.5);
-			 	this.remove(selectPiece.x, selectPiece.y);	
-			 	this.place(selectPiece, x, y);	
+			 	Piece tmpPiece = this.remove(selectPiece.x, selectPiece.y);	
+			 	this.place(tmpPiece, x, y);	
 				moveSelectPiece = true;
 			}
 		}
 		else{
-			if(selectPiece == null || selectPiece != null && selectPiece.isFire() == p.isFire()){
+			if(selectPiece == null || selectPiece != null && selectPiece.side() == p.side()){
 				if(selectPiece != null){
-			 		this.place(selectPiece, selectPiece.x, selectPiece.y);	
+			 		this.place(selectPiece, selectPiece.x, selectPiece.y);	// de-highlight previous selected Piece
 				}
 			 	StdDrawPlus.setPenColor(StdDrawPlus.WHITE);
 			 	StdDrawPlus.filledSquare(x + .5, y + .5, 0.5);
@@ -194,15 +172,21 @@ public class Board{
 				selectPiece = p;
 			}
 			else{
-			 	StdDrawPlus.setPenColor(StdDrawPlus.WHITE);
-			 	StdDrawPlus.filledSquare(x + .5, y + .5, 0.5);
-			 	this.remove(selectPiece.x, selectPiece.y);	
-				this.drawPiece(selectPiece, x, y);
-				p.removed = true;
-				selectPiece.x = x;
-				selectPiece.y = y;
-				moveSelectPiece = true;
-				selectPiece.hasCaptured = true;
+				if(selectPiece.isBomb()){
+			 		this.remove(selectPiece.x, selectPiece.y);	
+					selectPiece.move(x, y);
+					moveSelectPiece = true; 
+				}
+				else{
+			 		this.remove(selectPiece.x, selectPiece.y);	
+					this.place(selectPiece, x, y);
+					selectPiece = pieces[x][y];
+					moveSelectPiece = true; 
+			 	
+					StdDrawPlus.setPenColor(StdDrawPlus.WHITE);
+			 		StdDrawPlus.filledSquare(x + .5, y + .5, 0.5);
+					this.drawPiece(selectPiece, x, y); 
+				}
 			}
 		}	
 	}
@@ -215,7 +199,8 @@ public class Board{
 	}
 
 	public void endTurn(){
-		this.place(selectPiece, selectPiece.x, selectPiece.y);
+		if(!(selectPiece.isBomb() && selectPiece.hasCaptured()))
+			this.place(selectPiece, selectPiece.x, selectPiece.y);
 		selectPiece.doneCapturing();
 		selectPiece = null;
 		moveSelectPiece = false;
@@ -255,7 +240,7 @@ public class Board{
 				return true;
 			}
 			else{
-				if(p.isFire() == endP.isFire()){
+				if(p.side() == endP.side()){
 					return false;
 				}
 				else return true;

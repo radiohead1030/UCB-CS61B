@@ -12,7 +12,7 @@ public class TestBoard{
     @Test
     public void testPieceAt() {
         Piece p1 = b.pieceAt(0, 0); 
-       	assertEquals(b.pieces[0], p1);
+       	assertEquals(b.pieces[0][0], p1);
         
         Piece p2 = b.pieceAt(1,0); 
        	assertEquals(null, p2);
@@ -21,7 +21,7 @@ public class TestBoard{
        	assertEquals(null, p3);
 	
 	Piece p4 = b.pieceAt(3, 1); 
-       	assertEquals(b.pieces[5], p4);
+       	assertEquals(b.pieces[3][1], p4);
     }
     
     /** Tests canSelect method of canSelect */
